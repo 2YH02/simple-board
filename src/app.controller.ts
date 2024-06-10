@@ -22,8 +22,8 @@ export class AppController {
   @Get()
   getHello(@Ip() ip: string): string {
     // console.log(ip);
-    this.logger.log(ip);
-    console.log(this.configService.get<string>('ENVIRONMENT'));
+    // this.logger.log(ip);
+    // console.log(this.configService.get<string>('ENVIRONMENT'));
     return this.appService.getHello();
     // throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
   }
