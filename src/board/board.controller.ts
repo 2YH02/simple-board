@@ -18,6 +18,7 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 @ApiTags('Board')
 export class BoardController {
   constructor(private readonly boardSevice: BoardService) {}
+
   @Get()
   findAll() {
     return this.boardSevice.findAll();

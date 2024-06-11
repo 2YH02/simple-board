@@ -1,68 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Board } from 'src/entity/board.entity';
+import { User } from 'src/entity/user.entity';
+import { Repository } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Injectable()
 export class BoardService {
-  private boards = [
-    { id: 1, title: 'hello 1', content: 'content 1' },
-    { id: 2, title: 'hello 2', content: 'content 2' },
-    { id: 3, title: 'hello 3', content: 'content 3' },
-    { id: 4, title: 'hello 4', content: 'content 4' },
-    { id: 5, title: 'hello 5', content: 'content 5' },
-    { id: 6, title: 'hello 6', content: 'content 6' },
-    { id: 7, title: 'hello 7', content: 'content 7' },
-    { id: 8, title: 'hello 8', content: 'content 8' },
-    { id: 9, title: 'hello 9', content: 'content 9' },
-    { id: 10, title: 'hello 10', content: 'content 10' },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Board)
+    private boardRepository: Repository<Board>,
+  ) {}
 
-  findAll() {
-    return this.boards;
+  async findAll() {
+    const boards = await this.boardRepository.find();
+    return boards;
   }
 
-  find(id: number) {
-    const index = this.getBoardId(id);
-    return this.boards[index];
+  async find(id: number) {
+    const board = await this.boardRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        user: true,
+      },
+    });
+
+    if (!board) throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
+    return board;
   }
 
-  create(data: CreateBoardDto) {
-    const newBoard = { id: this.getNextId(), ...data };
-    this.boards.push(newBoard);
-    return newBoard;
+  async create(data: CreateBoardDto) {
+    return this.boardRepository.save(data);
   }
 
-  update(id: number, data: UpdateBoardDto) {
-    const index = this.getBoardId(id);
-    if (index > -1) {
-      this.boards[index] = {
-        ...this.boards[index],
-        ...data,
-      };
+  async update(id: number, data: UpdateBoardDto) {
+    const board = await this.getBoardById(id);
 
-      return this.boards[index];
-    }
-
-    return null;
+    if (!board) throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
+    return this.boardRepository.update(id, {
+      ...data,
+    });
   }
 
-  delete(id: number) {
-    const index = this.getBoardId(id);
+  async delete(id: number) {
+    const board = await this.getBoardById(id);
 
-    if (index > -1) {
-      const deleteBoard = this.boards[index];
-      this.boards.splice(index, 1);
-      return deleteBoard;
-    }
-
-    return null;
+    if (!board) throw new HttpException('NotFound', HttpStatus.NOT_FOUND);
+    return this.boardRepository.remove(board);
   }
 
-  getBoardId(id: number) {
-    return this.boards.findIndex((board) => board.id === id);
-  }
-
-  getNextId() {
-    return this.boards.sort((a, b) => b.id - a.id)[0].id + 1;
+  async getBoardById(id: number) {
+    return this.boardRepository.findOneBy({
+      id,
+    });
   }
 }

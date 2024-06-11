@@ -22,12 +22,6 @@ export class Board {
   userId: number;
 
   @ApiProperty({
-    description: '제목',
-  })
-  @Column()
-  title: string;
-
-  @ApiProperty({
     description: '내용',
   })
   @Column()
