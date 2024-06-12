@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Board } from './board.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -17,7 +18,8 @@ export class User {
   @ApiProperty({
     description: '비밀번호',
   })
-  @Column({ select: false })
+  @Column()
+  @Exclude()
   password: string;
 
   @ApiProperty({
