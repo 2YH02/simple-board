@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board } from 'src/entity/board.entity';
-import { User } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
@@ -14,8 +13,6 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 @Injectable()
 export class BoardService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
     @InjectRepository(Board)
     private boardRepository: Repository<Board>,
   ) {}
